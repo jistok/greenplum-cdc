@@ -47,7 +47,6 @@ $$
 LANGUAGE 'plpgsql';
 
 -- Scan and process the events (INSERT, UPDATE, DELETE) newer than last_ts
--- TODO: get last_ts from a tracking table, and UPDATE that value based on the data seen here.
 -- CREATE OR REPLACE FUNCTION process_events (last_ts TIMESTAMP)
 CREATE OR REPLACE FUNCTION process_events ()
   RETURNS VOID AS
