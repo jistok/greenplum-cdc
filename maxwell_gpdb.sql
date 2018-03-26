@@ -47,7 +47,8 @@ INSERT INTO maxwell_ts (ts) VALUES ('2010-01-01'::TIMESTAMP);
 -- 4. Periodically, load the AO table from the Kafka external table
 INSERT INTO maxwell_event
 SELECT
-  to_timestamp((events->>'ts')::int)
+  -- The precision of 'ts' varies by context; it's greater for the DDL events.
+  to_timestamp(case when length(events->>'ts') = 13 then ((events->>'ts')::bigint/1000)::int else (events->>'ts')::int end)
   , events->>'database'
   , events->>'table'
   , events->>'type'
