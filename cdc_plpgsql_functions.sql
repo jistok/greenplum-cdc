@@ -183,9 +183,17 @@ BEGIN
       RAISE INFO 'Got an %', op;
       -- Create a schema
       sql := 'CREATE SCHEMA ' || r.database_name ';';
+    ELSIF op = 'DATABASE-DROP' THEN
+      RAISE INFO 'Got an %', op;
+      -- Drop the schema with CASCADE
+      sql := 'DROP SCHEMA ' || r.database_name ' CASCADE;';
     ELSIF op = 'TABLE-CREATE' THEN
       RAISE INFO 'Got an %', op;
       -- Create a table within an existing schema
+      sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
+    ELSIF op = 'TABLE-DROP' THEN
+      RAISE INFO 'Got an %', op;
+      -- Drop table (include schema)
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSE
       RAISE INFO 'op: % is not one I care about', op;
