@@ -5,6 +5,52 @@
  *
  */
 
+CREATE OR REPLACE FUNCTION add_schema_name(schema TEXT, sql TEXT)
+RETURNS TEXT
+AS $$
+global schema
+global sql
+if None == sql or None == schema:
+  return None
+sql = sql.upper()
+import re
+return re.sub(r'((?:CREATE|DROP|ALTER)\s+TABLE)\s+(\w+)', r'\1 ' + schema + r'.\2', sql, re.IGNORECASE)
+$$ LANGUAGE plpythonu;
+
+-- Translate the MySQL dialect into a Greenplum/PostgreSQL flavor
+CREATE OR REPLACE FUNCTION translate_sql (sql TEXT)
+RETURNS TEXT
+AS $$
+global sql
+if None == sql:
+  return None
+
+sql = sql.upper()
+
+type_map = {
+  'DOUBLE': 'FLOAT8',
+  'DATETIME': 'TIMESTAMP',
+  'LONGBLOB': 'BYTEA',
+  'LONGTEXT': 'TEXT'
+}
+
+import re
+regex = re.compile(r'(TINYINT\(1\)|' + '|'.join(type_map.keys()) + ')')
+
+# Function for use only within translate_sql()
+def repl (m):
+  m1 = m.group(1)
+  rv = m1
+  if m1 and m1 in type_map:
+    rv = type_map[m1]
+  elif 'TINYINT(1)' == m1:
+    rv = 'SMALLINT'
+  return rv
+
+return regex.sub(repl, sql)
+$$ LANGUAGE plpythonu;
+-- GRANT EXECUTE ON FUNCTION translate_sql (FLOAT8, FLOAT8) TO maxwell;
+
 -- Get the data type for the given column
 -- DROP FUNCTION get_type (TEXT, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION get_type (s TEXT, t TEXT, c TEXT)
@@ -67,7 +113,7 @@ BEGIN
   SELECT ts from maxwell_ts INTO prev_ts;
   FOR r IN SELECT * FROM maxwell_event WHERE ts > prev_ts ORDER BY ts ASC
   LOOP
-    op := UPPER(r.type); -- op can be INSERT, UPDATE, or DELETE
+    op := UPPER(r.type); -- Can be INSERT, UPDATE, DELETE, or a DDL operation ('TABLE-CREATE', ...)
     cur_ts := r.ts;
     -- RAISE INFO 'DB: %, table: %, ts: %, op: %', r.database_name, r.table_name, r.ts, op;
     IF op = 'UPDATE' THEN
@@ -133,6 +179,14 @@ BEGIN
         pk_clause := pk_clause || '::' || get_type(r.database_name, r.table_name, key);
       END LOOP;
       sql := sql || pk_clause || ';';
+    ELSIF op = 'DATABASE-CREATE' THEN
+      RAISE INFO 'Got an %', op;
+      -- Create a schema
+      sql := 'CREATE SCHEMA ' || r.database_name ';';
+    ELSIF op = 'TABLE-CREATE' THEN
+      RAISE INFO 'Got an %', op;
+      -- Create a table within an existing schema
+      sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSE
       RAISE INFO 'op: % is not one I care about', op;
     END IF;
