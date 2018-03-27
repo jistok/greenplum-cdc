@@ -144,7 +144,12 @@ BEGIN
         pk_clause := key || ' = ' || quote_literal(r.event_json->'data'->>key);
         pk_clause := pk_clause || '::' || get_type(r.database_name, r.table_name, key);
       END LOOP;
-      sql := sql || pk_clause || ';';
+      IF LENGTH(pk_clause) > 0 THEN -- Require a primary key
+        sql := sql || pk_clause || ';';
+      ELSE
+        RAISE INFO 'No primary key on table % -- aborting the UPDATE', r.database_name || '.' || r.table_name;
+        sql := NULL;
+      END IF;
     ELSIF op = 'INSERT' THEN
       RAISE INFO 'Got an %', op;
       sql := 'INSERT INTO ' || r.database_name || '.' || r.table_name;
@@ -182,14 +187,18 @@ BEGIN
     ELSIF op = 'DATABASE-CREATE' THEN
       RAISE INFO 'Got an %', op;
       -- Create a schema
-      sql := 'CREATE SCHEMA ' || r.database_name ';';
+      sql := 'CREATE SCHEMA ' || r.database_name || ';';
     ELSIF op = 'DATABASE-DROP' THEN
       RAISE INFO 'Got an %', op;
       -- Drop the schema with CASCADE
-      sql := 'DROP SCHEMA ' || r.database_name ' CASCADE;';
+      sql := 'DROP SCHEMA ' || r.database_name || ' CASCADE;';
     ELSIF op = 'TABLE-CREATE' THEN
       RAISE INFO 'Got an %', op;
       -- Create a table within an existing schema
+      sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
+    ELSIF op = 'TABLE-ALTER' THEN
+      RAISE INFO 'Got an %', op;
+      -- Alter table (include schema)
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSIF op = 'TABLE-DROP' THEN
       RAISE INFO 'Got an %', op;
