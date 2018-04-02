@@ -10,17 +10,19 @@ Database can be brought in, to provide that long-term, deep analytical query
 back end.  This document introduces an approach to linking these two data
 backends.
 
-![View of tabbed terminal running the demo](./images/demo_vm_shell_view.png)
-
 ## Approach
-* [Maxwell's Daemon](http://maxwells-daemon.io/) captures any DDL or DML operations in MySQL and publishes them to a Kafka topic.
+* [Maxwell's Daemon](http://maxwells-daemon.io/) captures any DDL or DML operations in MySQL and publishes them to a Kafka topic, in a JSON format.
 * Apache Kafka provides the messaging layer.
 * Greenplum Database external tables, combined with [this Kafka integration approach](https://github.com/mgoddard-pivotal/gpdb-kafka-round-trip) enables Greenplum to ingest these MySQL events.
-* The events are published in JSON format and stored within Greenplum in their original format, so they can be replayed any time.
-* 
+* Periodically (see `./cdc_periodic_load.sql`):
+  - A Greenplum query polls the Kafka topic, inserting new events into the `maxwell_event` table
+  - Another Greenplum query runs the `process_events` PL/PGSQL function, which maintains the replicas of the MySQL objects
 
-## Demo Environment
-Note: the library which must be installed is highlighted in **bold**.
+## Running the demo (single VM, for now)
+![View of tabbed terminal running the demo](./images/demo_vm_shell_view.png)
+
+## Demo environment
+Note: the library which must be installed is highlighted in **bold**; this is mentioned in the above GitHub repo.
 <pre>
 [root@gpdb ~]# cat /etc/redhat-release 
 CentOS release 6.9 (Final)
@@ -58,10 +60,10 @@ Linux gpdb 2.6.32-696.el6.x86_64 #1 SMP Tue Mar 21 19:29:05 UTC 2017 x86_64 x86_
    * Form the `doc_id` using the primary key values from the table?
    * Also index/store the DB name and the table name
 
-## See Also
+## See also
 * [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
 
-## Known Issues
+## Known issues
 After the VM running the whole demo crashed, I encountered this state upon restarting Maxwell's Daemon:
 ```
 10:30:07,078 INFO  BinlogConnectorLifecycleListener - Binlog connected.
