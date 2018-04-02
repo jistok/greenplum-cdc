@@ -61,7 +61,8 @@ Linux gpdb 2.6.32-696.el6.x86_64 #1 SMP Tue Mar 21 19:29:05 UTC 2017 x86_64 x86_
 ## See Also
 * [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
 
-## Issues
+## Known Issues
+After the VM running the whole demo crashed, I encountered this state upon restarting Maxwell's Daemon:
 ```
 10:30:07,078 INFO  BinlogConnectorLifecycleListener - Binlog connected.
 10:30:07,129 WARN  BinlogConnectorLifecycleListener - Event deserialization failure.
@@ -80,7 +81,7 @@ Caused by: com.github.shyiko.mysql.binlog.event.deserialization.MissingTableMapE
 	at com.github.shyiko.mysql.binlog.event.deserialization.EventDeserializer.deserializeEventData(EventDeserializer.java:210) ~[mysql-binlog-connector-java-0.13.0.jar:0.13.0]
 	... 5 more
 ```
-**Resolution:**
+**This was the resolution, for the demo:**
 1. Stop Maxwell's Daemon
 1. Run the following from the MySQL command prompt, logged in as the DB super-user:
     ```
