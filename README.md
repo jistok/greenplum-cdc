@@ -25,12 +25,20 @@ backends.
   $ git clone https://github.com/mgoddard-pivotal/gpdb-kafka-round-trip.git
   ```
 * Follow the procedure [detailed here](https://github.com/mgoddard-pivotal/gpdb-kafka-round-trip) to get the `go-kafkacat` binary built.  Note that there some precompiled binaries in the `./bin` directory, which would make this simpler if there is one for your OS, though you will have to install librdkafka in any case.
-* Start up your Kafka:
+* Start up Kafka:
   - Edit the `kafka_env.sh` as required for your setup
-  - Start Zookeeper: `./zk_start.sh`
-  - Start Kafka: `./kafka_start.sh`
+  - Start Zookeeper: `$ ./zk_start.sh`
+  - Start Kafka: `$ ./kafka_start.sh` (See "Kafka log" tab in the picture)
 * Install MySQL server, configure it per the "Row based replication" section in the [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/), and start it up.
 * Run the `GRANT` commands shown in the "Mysql permissions" section of that Maxwell's Daemon quick start.
+* Download and extract the Maxwell's Daemon:
+  ```
+  $ curl -sLo - https://github.com/zendesk/maxwell/releases/download/v1.13.2/maxwell-1.13.2.tar.gz | tar zxvf -
+  ```
+* Start Maxwell's Daemon (See "Maxwell's Daemon" tab in the picture):
+  ```
+  $ ./maxwell-1.13.2/bin/maxwell --output_ddl=true --user='maxwell' --password='maxwell' --host='127.0.0.1' --producer=kafka --kafka.bootstrap.servers=localhost:9092
+  ```
 * Create the MySQL database "music", along with a user, for the [Spring Music app](https://github.com/cloudfoundry-samples/spring-music):
   ```
   mysql> CREATE DATABASE MUSIC;
@@ -46,10 +54,55 @@ backends.
   $ git clone https://github.com/cloudfoundry-samples/spring-music.git
   ```
 * Build the app per its instructions
-* Start the app (from within the `spring-music` directory):
+* Start the Spring Music app (from within the `spring-music` directory -- see "Spring Music" tab in the picture):
   ```
   $ java -jar ./build/libs/spring-music.jar
   ```
+* While logged in as `gpadmin`, run the following to set up the tables and functions to handle CDC:
+  ```
+  $ createdb maxwell
+  $ psql maxwell -f ./maxwell_gpdb.sql # Alter the 'PARTITION BY RANGE' endpoints as necessary
+  $ createlang plpythonu maxwell
+  $ psql maxwell -f ./cdc_plpgsql_functions.sql
+  ```
+* Start the periodic load into Greenplum (See "Kafka => Greenplum" tab in the picture):
+  ```
+  while true
+  do
+    echo "[`date`] Running Kafka to Greenplum ..."
+    psql maxwell -f ./cdc_periodic_load.sql
+    echo
+    sleep 5
+  done
+  ```
+* Poll the MySQL DB (See "MySQL poll" tab in the picture):
+  ```
+  while true
+  do
+    echo "[`date`] Polling the music.album table in MySQL ..."
+    echo "SELECT * FROM music.album ORDER BY artist, title;" | mysql --table -u music music
+    echo
+    sleep 5
+  done
+  ```
+* Poll Greenplum (See the "Greenplum poll" tab in the picture):
+  ```
+  while true
+  do
+    echo "[`date`] Polling the music.album table in Greenplum ..."
+    echo "SELECT * FROM music.album ORDER BY artist, title;" | psql maxwell
+    echo
+    sleep 5
+  done
+  ```
+* Access the [Spring Music UI](http://localhost:8080/) and make some changes to the data, then you should
+be able to see those changes occur in the Greenplum table via the "Greenplum poll" tab.
+* If you log into MySQL as "root", then run `CREATE DATABASE some_db_name`, you should be able to observe
+this event in the "Kafka => Greenplum" tab.  Here are some other DDL operations to try:
+  - `CREATE TABLE`
+  - `ALTER TABLE`
+  - `DROP TABLE`
+  - `DROP DATABASE`
 
 ## Demo environment
 Note: the library which must be installed is highlighted in **bold**; this is mentioned in the above GitHub repo.
