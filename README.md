@@ -18,8 +18,38 @@ backends.
   - A Greenplum query polls the Kafka topic, inserting new events into the `maxwell_event` table
   - Another Greenplum query runs the `process_events` PL/PGSQL function, which maintains the replicas of the MySQL objects
 
-## Running the demo (single VM, for now)
+## Running the demo (single VM with Greenplum 5.x installed and running)
 ![View of tabbed terminal running the demo](./images/demo_vm_shell_view.png)
+* Grab a copy of the Kafka demo referenced above:
+  ```
+  $ git clone https://github.com/mgoddard-pivotal/gpdb-kafka-round-trip.git
+  ```
+* Follow the procedure [detailed here](https://github.com/mgoddard-pivotal/gpdb-kafka-round-trip) to get the `go-kafkacat` binary built.  Note that there some precompiled binaries in the `./bin` directory, which would make this simpler if there is one for your OS, though you will have to install librdkafka in any case.
+* Start up your Kafka:
+  - Edit the `kafka_env.sh` as required for your setup
+  - Start Zookeeper: `./zk_start.sh`
+  - Start Kafka: `./kafka_start.sh`
+* Install MySQL server, configure it per the "Row based replication" section in the [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/), and start it up.
+* Run the `GRANT` commands shown in the "Mysql permissions" section of that Maxwell's Daemon quick start.
+* Create the MySQL database "music", along with a user, for the [Spring Music app](https://github.com/cloudfoundry-samples/spring-music):
+  ```
+  mysql> CREATE DATABASE MUSIC;
+  mysql> GRANT ALL ON music.* TO 'music'@'localhost' IDENTIFIED BY 'music';
+  ```
+* Simulate a Cloud Foundry app's environment, with a binding to a MySQL instance:
+  ```
+  $ export VCAP_APPLICATION=$( cat ./VCAP_APPLICATION.json )
+  $ export VCAP_SERVICES=$( cat ./VCAP_SERVICES_MYSQL.json )
+  ```
+* Get a local copy of the Spring music app:
+  ```
+  $ git clone https://github.com/cloudfoundry-samples/spring-music.git
+  ```
+* Build the app per its instructions
+* Start the app (from within the `spring-music` directory):
+  ```
+  $ java -jar ./build/libs/spring-music.jar
+  ```
 
 ## Demo environment
 Note: the library which must be installed is highlighted in **bold**; this is mentioned in the above GitHub repo.

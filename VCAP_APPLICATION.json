@@ -1,0 +1,22 @@
+{
+  "application_id": "f6dc4337-5ec8-4b5b-8beb-b66e46e8b125",
+  "application_name": "my-app",
+  "application_uris": [
+   "my-app.apps.mycf.com"
+  ],
+  "application_version": "58db056b-497c-45ff-aa28-8f7b70b5e5a5",
+  "cf_api": "https://api.system.mycf.com",
+  "limits": {
+   "disk": 1024,
+   "fds": 16384,
+   "mem": 128
+  },
+  "name": "my-app",
+  "space_id": "50f6a208-4bc7-4e2c-978b-77d5f979548d",
+  "space_name": "dev",
+  "uris": [
+   "my-app.apps.mycf.com"
+  ],
+  "users": null,
+  "version": "58db056b-497c-45ff-aa28-8f7b70b5e5a5"
+}
