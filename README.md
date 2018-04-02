@@ -8,3 +8,6 @@
    * Form the `doc_id` using the primary key values from the table?
    * Also index/store the DB name and the table name
 
+## See Also
+* [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
+
