@@ -142,6 +142,8 @@ Linux gpdb 2.6.32-696.el6.x86_64 #1 SMP Tue Mar 21 19:29:05 UTC 2017 x86_64 x86_
    * Try just using a single index for all tables
    * Form the `doc_id` using the primary key values from the table?
    * Also index/store the DB name and the table name
+3. Consider how an "undo" would work, since we can reverse any action.
+4. Enhance demo to include data from a µ-services architecture, like [this one](https://spring.io/blog/2015/07/14/microservices-with-spring)
 
 ## See also
 * [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
