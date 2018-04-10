@@ -135,6 +135,14 @@ Linux gpdb 2.6.32-696.el6.x86_64 #1 SMP Tue Mar 21 19:29:05 UTC 2017 x86_64 x86_
 	libselinux.so.1 => /lib64/libselinux.so.1 (0x0000003b0e400000)
 </pre>
 
+## Deploying Maxwell's Daemon in Cloud Foundry
+1. Create an instance of the MySQL service (NOTE: this won't work yet since it requires the escalated privileges to perform the required `GRANT` operations).
+1. Create an instance of a Kafka service (TBD on which tile will provide this; Stark & Wayne's tile is outdated).
+1. Copy `./manifest.yml` and `./run_maxwell.py` into the root of the Maxwell's Daemon project you downloaded.
+1. From within that directory: `cf push --no-start`
+1. Bind those two service intances to the app; e.g. `cf bs maxwell mysql && cf bs maxwell kafka`
+1. Start Maxwell's Daemon: `cf start maxwell`
+
 ## TODO
 1. Add some scripts to handle periodic Greenplum maintenance
    * [Vacuum tables and catalog](https://gpdb.docs.pivotal.io/43170/admin_guide/managing/maintain.html)

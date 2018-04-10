@@ -1,0 +1,43 @@
+{
+  "p.mysql": [
+   {
+    "credentials": {
+     "hostname": "127.0.0.1",
+     "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/maxwell?user=maxwell&password=maxwell",
+     "name": "maxwell",
+     "password": "maxwell",
+     "port": 3306,
+     "uri": "mysql://maxwell:maxwell@127.0.0.1:3306/maxwell?reconnect=true",
+     "username": "maxwell"
+    },
+    "label": "p.mysql",
+    "name": "mysql",
+    "plan": "db-small",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "mysql"
+    ],
+    "volume_mounts": []
+   }
+  ],
+  "starkandwayne-kstreams": [
+   {
+    "credentials": {
+      "hostname": "localhost:9092",
+      "topicName": "maxwell",
+      "uri": "kafka://localhost:9092/maxwell",
+      "zkPeers": "localhost:2181"
+    },
+    "label": "starkandwayne-kstreams",
+    "name": "kafka-service",
+    "plan": "topic",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "kafka"
+    ],
+    "volume_mounts": []
+   }
+  ]
+}

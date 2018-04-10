@@ -1,0 +1,14 @@
+---
+applications:
+- name: maxwell
+  memory: 1G
+  instances: 1
+  host: maxwell
+  path: .
+  command: python run_maxwell.py
+  health-check-type: process
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  no-route: true
+  env:
+    JBP_CONFIG_JAVA_MAIN: '{java_main_class: "DoesNotMatter"}'
+
