@@ -1,7 +1,7 @@
 # Change Data Capture (CDC) from MySQL to Greenplum Database
 
 ## Abstract
-When an Pivotal Cloud Foundry operator installs PCF, it’s very likely they will
+When a Pivotal Cloud Foundry operator installs PCF, it’s very likely they will
 choose to deploy the MySQL database tile (this is my personal observation).
 With this in place, developers can easily self-provision a persistence layer
 for their applications.  These are optimized for transactional workloads, but
