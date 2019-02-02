@@ -144,6 +144,7 @@ Linux gpdb 2.6.32-696.el6.x86_64 #1 SMP Tue Mar 21 19:29:05 UTC 2017 x86_64 x86_
 1. Start Maxwell's Daemon: `cf start maxwell`
 
 ## TODO
+0. Switch from Kafka to RabbitMQ
 1. Add some scripts to handle periodic Greenplum maintenance
    * [Vacuum tables and catalog](https://gpdb.docs.pivotal.io/43170/admin_guide/managing/maintain.html)
 2. Add another consumer group to "fan out" fan out to Elastic Search
