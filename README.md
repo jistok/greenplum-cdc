@@ -31,7 +31,7 @@ backends.
   - Start Kafka: `$ ./kafka_start.sh` (See "Kafka log" tab in the picture)
 * Install MySQL server, configure it per the "Row based replication" section in the [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/), and start it up.
 * Run the `GRANT` commands shown in the "Mysql permissions" section of that Maxwell's Daemon quick start.
-* Download and extract the Maxwell's Daemon:
+* Download and extract Maxwell's Daemon:
   ```
   $ curl -sLo - https://github.com/zendesk/maxwell/releases/download/v1.13.2/maxwell-1.13.2.tar.gz | tar zxvf -
   ```
