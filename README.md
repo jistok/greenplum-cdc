@@ -2,13 +2,14 @@
 
 ## Abstract
 When a Pivotal Cloud Foundry operator installs PCF, it’s very likely they will
-choose to deploy the MySQL database tile (this is my personal observation).
+choose to deploy the MySQL database tile (the author's observation).
 With this in place, developers can easily self-provision a persistence layer
-for their applications.  These are optimized for transactional workloads, but
-not large data sets and analytical queries.  This is where Pivotal Greenplum
-Database can be brought in, to provide that long-term, deep analytical query
-back end.  This document introduces an approach to linking these two data
-backends.
+for their applications.  Each of these MySQL database instances tends to serve
+a single application so, with multiple apps running, you end up with multiple
+databases.  These are optimized for transactional workloads, but
+not complex, analytical queries or very large data sets.  This is where
+[Greenplum Database](https://greenplum.org) can be brought in, to complement those
+MySQL databases by providing that long-term, deep analytical platform.
 
 ## Approach
 * [Maxwell's Daemon](http://maxwells-daemon.io/) captures any DDL or DML operations in MySQL and publishes them to a RabbitMQ exchange, in a JSON format.
