@@ -58,11 +58,11 @@ MySQL databases by providing that long-term, deep analytical platform.
   $ createlang plpythonu maxwell
   $ psql maxwell -f ./cdc_plpgsql_functions.sql
   ```
-* Start the periodic load into Greenplum (See "Kafka => Greenplum" tab in the picture):
+* Start the periodic load into Greenplum:
   ```
   while true
   do
-    echo "[`date`] Running Kafka to Greenplum ..."
+    echo "[`date`] Running RabbitMQ to Greenplum ..."
     psql maxwell -f ./cdc_periodic_load.sql
     echo
     sleep 5
@@ -91,7 +91,7 @@ MySQL databases by providing that long-term, deep analytical platform.
 * Access the [Spring Music UI](http://localhost:8080/) and make some changes to the data, then you should
 be able to see those changes occur in the Greenplum table via the "Greenplum poll" tab.
 * If you log into MySQL as "root", then run `CREATE DATABASE some_db_name`, you should be able to observe
-this event in the "Kafka => Greenplum" tab.  Here are some other DDL operations to try:
+this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operations to try:
   - `CREATE TABLE`
   - `ALTER TABLE`
   - `DROP TABLE`
@@ -100,14 +100,13 @@ this event in the "Kafka => Greenplum" tab.  Here are some other DDL operations 
 ## Deploying Maxwell's Daemon in Cloud Foundry
 1. Create an instance of the MySQL service (NOTE: this won't work yet since it requires the escalated privileges to perform the required `GRANT` operations).
 1. [Accessing service instance via SSH](https://docs.pivotal.io/pivotalcf/2-3/devguide/deploy-apps/ssh-services.html)
-1. Create an instance of a Kafka service (TBD on which tile will provide this; Stark & Wayne's tile is outdated).
+1. Create an instance of a RabbitMQ service.
 1. Copy `./manifest.yml` and `./run_maxwell.py` into the root of the Maxwell's Daemon project you downloaded.
 1. From within that directory: `cf push --no-start`
-1. Bind those two service intances to the app; e.g. `cf bs maxwell mysql && cf bs maxwell kafka`
+1. Bind those two service intances to the app; e.g. `cf bs maxwell mysql && cf bs maxwell rabbit`
 1. Start Maxwell's Daemon: `cf start maxwell`
 
 ## TODO
-0. Switch from Kafka to RabbitMQ
 1. Add some scripts to handle periodic Greenplum maintenance
    * [Vacuum tables and catalog](https://gpdb.docs.pivotal.io/43170/admin_guide/managing/maintain.html)
 2. Add another consumer group to "fan out" fan out to Elastic Search
