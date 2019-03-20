@@ -14,7 +14,7 @@ if None == sql or None == schema:
   return None
 sql = sql.upper()
 import re
-return re.sub(r'((?:CREATE|DROP|ALTER)\s+TABLE)\s+(\w+)', r'\1 ' + schema + r'.\2', sql, re.IGNORECASE)
+return re.sub(r'((?:CREATE|DROP|ALTER)\s+TABLE(?:\s+IF EXISTS)?)\s+(\w+)', r'\1 ' + schema + r'.\2', sql, re.IGNORECASE)
 $$ LANGUAGE plpythonu;
 
 -- Translate the MySQL dialect into a Greenplum/PostgreSQL flavor
@@ -35,8 +35,14 @@ type_map = {
 }
 
 import re
-regex = re.compile(r'(TINYINT\(1\)|' + '|'.join(type_map.keys()) + ')')
 
+# Remove any MySQL storage engine specs
+sql = re.sub(r'\bENGINE\s*=\s*\S+', "", sql, flags=re.IGNORECASE)
+
+# Remove any backticks around table names (may be too loose)
+sql = re.sub(r'`', "", sql)
+
+regex = re.compile(r'(TINYINT\(1\)|' + '|'.join(type_map.keys()) + ')')
 # Function for use only within translate_sql()
 def repl (m):
   m1 = m.group(1)
@@ -117,7 +123,7 @@ BEGIN
     cur_ts := r.ts;
     -- RAISE INFO 'DB: %, table: %, ts: %, op: %', r.database_name, r.table_name, r.ts, op;
     IF op = 'UPDATE' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       to_set := '';
       sql := 'UPDATE ' || r.database_name || '.' || r.table_name || ' SET ';
       FOR key IN SELECT JSON_OBJECT_KEYS(r.event_json->'old')
@@ -151,7 +157,7 @@ BEGIN
         sql := NULL;
       END IF;
     ELSIF op = 'INSERT' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       sql := 'INSERT INTO ' || r.database_name || '.' || r.table_name;
       ins_cols = '';
       ins_vals = '';
@@ -171,7 +177,7 @@ BEGIN
       END LOOP;
       sql := sql || '(' || ins_cols || ') VALUES (' || ins_vals || ');';
     ELSIF op = 'DELETE' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Handle DELETE
       sql := 'DELETE FROM ' || r.database_name || '.' || r.table_name || ' WHERE ';
       pk_clause := '';
@@ -185,23 +191,23 @@ BEGIN
       END LOOP;
       sql := sql || pk_clause || ';';
     ELSIF op = 'DATABASE-CREATE' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Create a schema
       sql := 'CREATE SCHEMA ' || r.database_name || ';';
     ELSIF op = 'DATABASE-DROP' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Drop the schema with CASCADE
       sql := 'DROP SCHEMA ' || r.database_name || ' CASCADE;';
     ELSIF op = 'TABLE-CREATE' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Create a table within an existing schema
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSIF op = 'TABLE-ALTER' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Alter table (include schema)
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSIF op = 'TABLE-DROP' THEN
-      RAISE INFO 'Got an %', op;
+      RAISE INFO 'Got: %', op;
       -- Drop table (include schema)
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSE
@@ -223,4 +229,3 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql';
-

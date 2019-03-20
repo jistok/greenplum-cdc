@@ -99,6 +99,7 @@ this event in the "Kafka => Greenplum" tab.  Here are some other DDL operations 
 
 ## Deploying Maxwell's Daemon in Cloud Foundry
 1. Create an instance of the MySQL service (NOTE: this won't work yet since it requires the escalated privileges to perform the required `GRANT` operations).
+1. [Accessing service instance via SSH](https://docs.pivotal.io/pivotalcf/2-3/devguide/deploy-apps/ssh-services.html)
 1. Create an instance of a Kafka service (TBD on which tile will provide this; Stark & Wayne's tile is outdated).
 1. Copy `./manifest.yml` and `./run_maxwell.py` into the root of the Maxwell's Daemon project you downloaded.
 1. From within that directory: `cf push --no-start`

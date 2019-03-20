@@ -7,8 +7,7 @@ SELECT
   , events->>'table'
   , events->>'type'
   , events
-FROM maxwell_kafka;
+FROM maxwell_rabbitmq;
 
 -- Event table to replica of the MySQL table
 SELECT process_events();
-
