@@ -115,10 +115,13 @@ DECLARE
   pk_clause TEXT;
   ins_cols TEXT;
   ins_vals TEXT;
+  do_sql BOOLEAN;
+  sql_tmp TEXT;
 BEGIN
   SELECT ts from maxwell_ts INTO prev_ts;
   FOR r IN SELECT * FROM maxwell_event WHERE ts > prev_ts ORDER BY ts ASC
   LOOP
+    sql := NULL;
     op := UPPER(r.type); -- Can be INSERT, UPDATE, DELETE, or a DDL operation ('TABLE-CREATE', ...)
     cur_ts := r.ts;
     -- RAISE INFO 'DB: %, table: %, ts: %, op: %', r.database_name, r.table_name, r.ts, op;
@@ -208,8 +211,15 @@ BEGIN
       sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
     ELSIF op = 'TABLE-DROP' THEN
       RAISE INFO 'Got: %', op;
-      -- Drop table (include schema)
-      sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
+      -- Verify schema exists; if not, then the DROP TABLE isn't required.
+      sql_tmp := 'SELECT x.n = 1 FROM (SELECT COUNT(*) n FROM information_schema.schemata';
+      sql_tmp := sql_tmp || ' WHERE schema_name = ''' || r.database_name || ''') x;';
+      -- RAISE INFO 'SQL_TMP: %', sql_tmp
+      EXECUTE sql_tmp INTO do_sql;
+      IF do_sql THEN
+        -- Drop table (include schema)
+        sql := add_schema_name(r.database_name, translate_sql(r.event_json->>'sql')) || ';';
+      END IF;
     ELSE
       RAISE INFO 'op: % is not one I care about', op;
     END IF;

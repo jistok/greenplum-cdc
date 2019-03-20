@@ -121,7 +121,8 @@ this event in the "Kafka => Greenplum" tab.  Here are some other DDL operations 
 * [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
 
 ## Known issues
-After the VM running the whole demo crashed, I encountered this state upon restarting Maxwell's Daemon:
+
+### After the VM running the whole demo crashed, I encountered this state upon restarting Maxwell's Daemon:
 ```
 10:30:07,078 INFO  BinlogConnectorLifecycleListener - Binlog connected.
 10:30:07,129 WARN  BinlogConnectorLifecycleListener - Event deserialization failure.
