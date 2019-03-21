@@ -178,7 +178,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 		)
 		lastDelivery = d
 		timeOfLastDelivery = time.Now()
-		d.Ack(false) // TODO: Move this into main() and only Ack(true) on success.
+		d.Ack(true) // todo: move this into main() and only ack on success.
 	}
 	fmt.Fprintf(os.Stderr, "handle: deliveries channel closed\n")
 	done <- nil
