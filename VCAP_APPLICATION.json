@@ -1,0 +1,22 @@
+{
+  "application_id": "61b07022-a498-4bc9-bab5-7101fbd6d298",
+  "application_name": "spring-music",
+  "application_uris": [
+   "spring-music.apps.pcf.mydomain.com"
+  ],
+  "application_version": "e9dad317-f435-43e5-814e-dc3f52a835af",
+  "cf_api": "https://api.sys.pcf.mydomain.com",
+  "limits": {
+   "disk": 1024,
+   "fds": 16384,
+   "mem": 1024
+  },
+  "name": "spring-music",
+  "space_id": "7f46cb27-90eb-4e74-915f-4b701034d01d",
+  "space_name": "dev",
+  "uris": [
+   "spring-music.apps.pcf.mydomain.com"
+  ],
+  "users": null,
+  "version": "e9dad317-f435-43e5-814e-dc3f52a835af"
+}
