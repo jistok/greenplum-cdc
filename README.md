@@ -35,6 +35,7 @@ MySQL databases by providing that long-term, deep analytical platform.
 * Create the MySQL database "music", along with a user, for the [Spring Music app](https://github.com/cloudfoundry-samples/spring-music):
   ```
   mysql> CREATE DATABASE music;
+  mysql> CREATE USER 'music'@'localhost' IDENTIFIED BY 'music';
   mysql> GRANT ALL ON music.* TO 'music'@'localhost' IDENTIFIED BY 'music';
   ```
 * Simulate a Cloud Foundry app's environment, with a binding to a MySQL instance:
