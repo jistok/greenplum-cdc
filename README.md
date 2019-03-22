@@ -52,6 +52,16 @@ MySQL databases by providing that long-term, deep analytical platform.
   ```
   $ java -jar ./build/libs/spring-music.jar
   ```
+* Build / Install the RabbitMQ client (the example here is for CentOS 7.5.x):
+  ```
+  $ git clone https://github.com/mgoddard-pivotal/greenplum-cdc.git
+  $ cd greenplum-cdc/
+  $ git checkout rabbitmq
+  $ sudo yum -y install go
+  $ go get github.com/streadway/amqp
+  $ go build rabbitmq.go
+  $ cp -f rabbitmq ~/
+  ```
 * While logged in as `gpadmin`, run the following to set up the tables and functions to handle CDC:
   ```
   $ createdb maxwell
@@ -59,7 +69,7 @@ MySQL databases by providing that long-term, deep analytical platform.
   $ createlang plpythonu maxwell
   $ psql maxwell -f ./cdc_plpgsql_functions.sql
   ```
-* Start the periodic load into Greenplum:
+* In a terminal (or tab), start the periodic load into Greenplum:
   ```
   while true
   do
@@ -69,7 +79,7 @@ MySQL databases by providing that long-term, deep analytical platform.
     sleep 5
   done
   ```
-* Poll the MySQL DB (See "MySQL poll" tab in the picture):
+* (Optional) In a different terminal/tab, poll the MySQL DB (See "MySQL poll" tab in the picture):
   ```
   while true
   do
@@ -79,7 +89,7 @@ MySQL databases by providing that long-term, deep analytical platform.
     sleep 5
   done
   ```
-* Poll Greenplum (See the "Greenplum poll" tab in the picture):
+* In another terminal/tab, poll Greenplum (See the "Greenplum poll" tab in the picture):
   ```
   while true
   do
