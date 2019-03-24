@@ -27,7 +27,7 @@ var (
 	queue        = flag.String("queue", "test-queue", "Ephemeral AMQP queue name")
 	bindingKey   = flag.String("key", "test-key", "AMQP binding key")
 	consumerTag  = flag.String("consumer-tag", "simple-consumer", "AMQP consumer tag (should not be blank)")
-	lifetime     = flag.Duration("lifetime", 100*time.Millisecond, "lifetime of process before shutdown, ms (default: 100ms)")
+	lifetime     = flag.Duration("lifetime", 100*time.Millisecond, "Max. time to wait for data, ms (default: 100ms)")
 )
 
 // Holds most recent Delivery, so it can be Ack'd
@@ -38,11 +38,14 @@ var timeOfLastDelivery time.Time = time.Now()
 
 var re = regexp.MustCompile(`[\r\n]+`)
 
+var tSleep time.Duration = 100 * time.Millisecond
+
 func init() {
 	flag.Parse()
 }
 
 func main() {
+
 	c, err := NewConsumer(*uri, *exchange, *exchangeType, *queue, *bindingKey, *consumerTag)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -50,17 +53,18 @@ func main() {
 	}
 
 	for timeOfLastDelivery = time.Now(); time.Now().Sub(timeOfLastDelivery).Seconds() <= (*lifetime).Seconds(); {
-		fmt.Fprintf(os.Stderr, "Sleeping ...\n")
-		time.Sleep(100 * time.Millisecond)
+		fmt.Fprintf(os.Stderr, "Sleeping %v ...\n", tSleep)
+		time.Sleep(tSleep)
 	}
 
 	// Ack all deliveries
-	//lastDelivery.Ack(true)
+	lastDelivery.Ack(true)
 
 	if err := c.Shutdown(); err != nil {
 		fmt.Fprintf(os.Stderr, "error during shutdown: %s\n", err)
 		os.Exit(1)
 	}
+
 }
 
 type Consumer struct {
@@ -174,11 +178,11 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		fmt.Printf(
 			"%s\n",
-			re.ReplaceAllString(string(d.Body), " "),
+			re.ReplaceAllString(string(d.Body), " "), // Replace CR/NL with space
 		)
 		lastDelivery = d
 		timeOfLastDelivery = time.Now()
-		d.Ack(true) // todo: move this into main() and only ack on success.
+		//d.Ack(true) // todo: move this into main() and only ack on success.
 	}
 	fmt.Fprintf(os.Stderr, "handle: deliveries channel closed\n")
 	done <- nil
