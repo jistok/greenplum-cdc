@@ -107,7 +107,7 @@ be able to see those changes occur in the Greenplum table via the "Greenplum pol
 * If you log into MySQL as "root", then run `CREATE DATABASE some_db_name`, you should be able to observe
 this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operations to try:
   - `CREATE TABLE`
-  - `ALTER TABLE`
+  - `ALTER TABLE`: `alter table album add column price decimal(15, 2);`
   - `DROP TABLE`
   - `DROP DATABASE`
 
