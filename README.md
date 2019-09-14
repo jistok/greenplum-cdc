@@ -32,26 +32,6 @@ MySQL databases by providing that long-term, deep analytical platform.
   ```
   $ ./maxwell-1.20.0/bin/maxwell --output_ddl=true --user='maxwell' --password='maxwell' --producer=rabbitmq --rabbitmq_host='127.0.0.1' --rabbitmq_routing_key_template="mysql-cdc" --rabbitmq_exchange_durable=true
   ```
-* Create the MySQL database "music", along with a user, for the [Spring Music app](https://github.com/cloudfoundry-samples/spring-music):
-  ```
-  mysql> CREATE DATABASE music;
-  mysql> CREATE USER 'music'@'localhost' IDENTIFIED BY 'music';
-  mysql> GRANT ALL ON music.* TO 'music'@'localhost' IDENTIFIED BY 'music';
-  ```
-* Simulate a Cloud Foundry app's environment, with a binding to a MySQL instance:
-  ```
-  $ export VCAP_APPLICATION=$( cat ./VCAP_APPLICATION.json )
-  $ export VCAP_SERVICES=$( cat ./VCAP_SERVICES_MYSQL.json )
-  ```
-* Get a local copy of the Spring music app:
-  ```
-  $ git clone https://github.com/cloudfoundry-samples/spring-music.git
-  ```
-* Build the app per its instructions
-* Start the Spring Music app (from within the `spring-music` directory -- see "Spring Music" tab in the picture):
-  ```
-  $ java -jar ./build/libs/spring-music.jar
-  ```
 * Build / Install the RabbitMQ client (the example here is for CentOS 7.5.x):
   ```
   $ git clone https://github.com/mgoddard-pivotal/greenplum-cdc.git
@@ -98,6 +78,26 @@ MySQL databases by providing that long-term, deep analytical platform.
     echo
     sleep 5
   done
+  ```
+* Create the MySQL database "music", along with a user, for the [Spring Music app](https://github.com/cloudfoundry-samples/spring-music):
+  ```
+  mysql> CREATE DATABASE music;
+  mysql> CREATE USER 'music'@'localhost' IDENTIFIED BY 'music';
+  mysql> GRANT ALL ON music.* TO 'music'@'localhost' IDENTIFIED BY 'music';
+  ```
+* Simulate a Cloud Foundry app's environment, with a binding to a MySQL instance:
+  ```
+  $ export VCAP_APPLICATION=$( cat ./VCAP_APPLICATION.json )
+  $ export VCAP_SERVICES=$( cat ./VCAP_SERVICES_MYSQL.json )
+  ```
+* Get a local copy of the Spring music app:
+  ```
+  $ git clone https://github.com/cloudfoundry-samples/spring-music.git
+  ```
+* Build the app per its instructions
+* Start the Spring Music app (from within the `spring-music` directory -- see "Spring Music" tab in the picture):
+  ```
+  $ java -jar ./build/libs/spring-music.jar
   ```
 * Access the [Spring Music UI](http://localhost:8080/) and make some changes to the data, then you should
 be able to see those changes occur in the Greenplum table via the "Greenplum poll" tab.
