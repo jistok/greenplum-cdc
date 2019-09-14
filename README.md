@@ -68,7 +68,7 @@ MySQL databases by providing that long-term, deep analytical platform.
 * Simulate a Cloud Foundry app's environment, with a binding to a MySQL instance:
   ```
   $ export VCAP_APPLICATION=$( cat ./VCAP_APPLICATION.json )
-  $ export VCAP_SERVICES=$( cat ./VCAP_SERVICES_MYSQL.json )
+  $ export VCAP_SERVICES=$( cat ./VCAP_SERVICES.json )
   ```
 * Get a local copy of the Spring music app:
   ```
