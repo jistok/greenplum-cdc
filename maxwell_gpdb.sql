@@ -5,7 +5,7 @@
 DROP EXTERNAL TABLE IF EXISTS maxwell_rabbitmq;
 CREATE EXTERNAL WEB TABLE maxwell_rabbitmq
 (events JSON)
-EXECUTE '$HOME/rabbitmq -exchange maxwell -exchange-type fanout -key mysql-cdc -uri "amqp://maxwell:maxwell@192.168.1.7:5672/" 2>>$HOME/rabbitmq.log'
+EXECUTE '$HOME/rabbitmq -exchange maxwell -exchange-type fanout -key mysql-cdc -uri "amqp://guest:guest@192.168.1.7:5672/" 2>>$HOME/rabbitmq.log'
 ON MASTER FORMAT 'TEXT' (DELIMITER 'OFF' NULL '')
 SEGMENT REJECT LIMIT 1 PERCENT;
 
