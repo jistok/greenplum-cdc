@@ -75,9 +75,12 @@ MySQL databases by providing that long-term, deep analytical platform.
   $ git clone https://github.com/cloudfoundry-samples/spring-music.git
   ```
 * Build the app per its instructions
+  ```
+  $ cd spring-music/ ; ./gradlew clean build
+  ```
 * Start the Spring Music app (from within the `spring-music` directory -- see "Spring Music" tab in the picture):
   ```
-  $ java -jar ./build/libs/spring-music.jar
+  $ java -jar ./build/libs/spring-music-1.0.jar
   ```
 * (Optional) In a different terminal/tab, poll the MySQL DB (See "MySQL poll" tab in the picture):
   ```
