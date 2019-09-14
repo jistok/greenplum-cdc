@@ -36,7 +36,7 @@ var lastDelivery amqp.Delivery
 // When did we handle the last delivery?
 var timeOfLastDelivery time.Time = time.Now()
 
-var re = regexp.MustCompile(`[\r\n]+`)
+var re = regexp.MustCompile(`[\t\r\n]+`)
 
 var tSleep time.Duration = 100 * time.Millisecond
 
@@ -178,7 +178,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		fmt.Printf(
 			"%s\n",
-			re.ReplaceAllString(string(d.Body), " "), // Replace CR/NL with space
+			re.ReplaceAllString(string(d.Body), " "), // Replace TAB, CR, NL with space
 		)
 		lastDelivery = d
 		timeOfLastDelivery = time.Now()

@@ -5,8 +5,9 @@
 DROP EXTERNAL TABLE IF EXISTS maxwell_rabbitmq;
 CREATE EXTERNAL WEB TABLE maxwell_rabbitmq
 (events JSON)
-EXECUTE '$HOME/rabbitmq -exchange maxwell -exchange-type fanout -key mysql-cdc -uri "amqp://guest:guest@192.168.1.7:5672/" 2>>$HOME/rabbitmq.log'
-ON MASTER FORMAT 'TEXT' (DELIMITER 'OFF' NULL '')
+EXECUTE '$HOME/rabbitmq -exchange maxwell -exchange-type fanout -key mysql-cdc -uri "amqp://guest:guest@localhost:5672/" 2>>$HOME/rabbitmq.log'
+-- ON MASTER FORMAT 'TEXT' (DELIMITER 'OFF' NULL '') -- 'OFF' won't work with Greenplum 6 for some reason
+ON MASTER FORMAT 'TEXT' (DELIMITER E'\t' NULL '') -- rabbitmq.go removes any tabs
 SEGMENT REJECT LIMIT 1 PERCENT;
 
 -- 2. This table archives the entire event stream, as JSON, but with certain fields pulled out into their own columns
