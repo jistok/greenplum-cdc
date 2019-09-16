@@ -1,7 +1,7 @@
 # Change Data Capture (CDC) from MySQL to Greenplum Database
 
 ## Abstract
-When a Pivotal Cloud Foundry operator installs PCF, it’s very likely they will
+When a Pivotal Cloud Foundry operator installs PCF, it’s likely they will
 choose to deploy the MySQL database tile (the author's observation).
 With this in place, developers can easily self-provision a persistence layer
 for their applications.  Each of these MySQL database instances tends to serve
@@ -19,7 +19,7 @@ MySQL databases by providing that long-term, deep analytical platform.
   - A Greenplum query polls RabbitMQ, inserting new events into the `maxwell_event` table
   - Another Greenplum query runs the `process_events` PL/PGSQL function, which maintains the replicas of the MySQL objects
 
-## Running the demo (single VM with Greenplum 5.x installed and running)
+## Running the demo on a single virtual machine (VM)
 ![View of tabbed terminal running the demo](./images/demo_vm_shell_view.png)
 * Install RabbitMQ and start it up (varies by operating system; Homebrew works on a Mac)
 * Install MySQL server, configure it per the "Row based replication" section in the [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/), and start it up.
@@ -28,16 +28,16 @@ MySQL databases by providing that long-term, deep analytical platform.
   ```
   $ curl -sLo - https://github.com/zendesk/maxwell/releases/download/v1.20.0/maxwell-1.20.0.tar.gz | tar zxvf -
   ```
-* Start Maxwell's Daemon (See "Maxwell's Daemon" tab in the picture):
+* Start Maxwell's Daemon (by default, it uses the "guest" account in RabbitMQ):
   ```
   $ ./maxwell-1.20.0/bin/maxwell --output_ddl=true --user='maxwell' --password='maxwell' --producer=rabbitmq --rabbitmq_host='127.0.0.1' --rabbitmq_routing_key_template="mysql-cdc" --rabbitmq_exchange_durable=true
   ```
-* Build / Install the RabbitMQ client (the example here is for CentOS 7.5.x):
+* Build / Install the RabbitMQ client:
   ```
   $ git clone https://github.com/mgoddard-pivotal/greenplum-cdc.git
   $ cd greenplum-cdc/
   $ git checkout rabbitmq
-  $ sudo yum -y install go
+  $ sudo yum -y install go # On CentOS.  Use whichever installation method applies to your OS.
   $ go get github.com/streadway/amqp
   $ go build rabbitmq.go
   $ cp -f rabbitmq ~/
@@ -49,7 +49,7 @@ MySQL databases by providing that long-term, deep analytical platform.
   $ createlang plpythonu maxwell
   $ psql maxwell -f ./cdc_plpgsql_functions.sql
   ```
-* In a terminal (or tab), start the periodic load into Greenplum:
+* In a terminal, start the periodic load into Greenplum:
   ```
   while true
   do
@@ -107,7 +107,7 @@ be able to see those changes occur in the Greenplum table via the "Greenplum pol
 * If you log into MySQL as "root", then run `CREATE DATABASE some_db_name`, you should be able to observe
 this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operations to try:
   - `CREATE TABLE`
-  - `ALTER TABLE`: `alter table album add column price decimal(15, 2);`
+  - `ALTER TABLE`: `ALTER TABLE album ADD COLUMN price DECIMAL(15, 2);`
   - `DROP TABLE`
   - `DROP DATABASE`
 
@@ -162,3 +162,4 @@ Caused by: com.github.shyiko.mysql.binlog.event.deserialization.MissingTableMapE
     mysql> DROP DATABASE maxwell;
     ```
 1. Restart Maxwell's Daemon
+
