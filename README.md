@@ -47,8 +47,9 @@ MySQL databases by providing that long-term, deep analytical platform.
      ```
   1. Restart the SSH daemon: `sudo service sshd restart`
   1. Assign a password for user `ubuntu`: `sudo passwd ubuntu`.  We'll refer to this later as `NEW_PASSWORD`.
-* Install and initialize Greenplum Database: [OSS](https://greenplum.org/download/) or
-  [Pivotal supported](https://network.pivotal.io/products/pivotal-gpdb/)
+* Install and initialize Greenplum Database: [OSS](https://greenplum.org/download/),
+  [Pivotal supported](https://network.pivotal.io/products/pivotal-gpdb/), or even an
+  [easy button](https://aws.amazon.com/marketplace/pp/B06XKQ8Z3H) cloud version.
 * Install RabbitMQ and start it up (varies by operating system).
 * Install MySQL server.
 * Follow the procedure in [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/)

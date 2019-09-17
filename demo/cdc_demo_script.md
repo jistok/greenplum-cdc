@@ -1,6 +1,6 @@
 # CDC Demo Script
 
-## NOTE
+## Notes
 
 * So far, this has been tested using Chrome, on a Mac.
 * The hostname in these links, `cdc-demo.hooliroof.com`, varies per installation of the demo.
