@@ -1,5 +1,7 @@
 # Change Data Capture (CDC) from MySQL to Greenplum Database
 
+![Components of the CDC demo](./images/cdc_demo_arch_diagram.png)
+
 ## Abstract
 When a Pivotal Cloud Foundry operator installs PCF, it’s likely they will
 choose to deploy the MySQL database tile (the author's observation).
@@ -17,30 +19,56 @@ MySQL databases by providing that long-term, deep analytical platform.
 * Greenplum Database external tables uses [this RabbitMQ client](./rabbitmq.go) to ingest these MySQL events.
 * Periodically (see `./cdc_periodic_load.sql`):
   - A Greenplum query polls RabbitMQ, inserting new events into the `maxwell_event` table
-  - Another Greenplum query runs the `process_events` PL/PGSQL function, which maintains the replicas of the MySQL objects
+  - A separate Greenplum query runs the maintains replicas of the MySQL objects
 
-## Running the demo on a single virtual machine (VM)
-![View of tabbed terminal running the demo](./images/demo_vm_shell_view.png)
-* Install RabbitMQ and start it up (varies by operating system; Homebrew works on a Mac)
-* Install MySQL server, configure it per the "Row based replication" section in the [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/), and start it up.
-* Run the `GRANT` commands shown in the "Mysql permissions" section of that Maxwell's Daemon quick start.
-* Download and extract Maxwell's Daemon:
+## Setting up the demo on a single virtual machine (VM)
+![View of demo running in web browser tabs](./images/cdc_demo_browser_view.png)
+
+**NOTE:** If the demo has already been configured, skip to [this link](./demo/cdc_demo_script.md)
+
+* Deploy a Linux based VM (here, we are using a t2.xlarge VM, running Ubuntu 18.04, on EC2).
+* The demo is run via several terminals running via
+  [WebSSH](https://github.com/huashengdun/webssh), which must be installed and
+  [started using SSL](./demo/00_start_webssh.sh), with a [firewall rule](images/ec2_firewall_settings.png) set
+  up to permit traffic to this port of the VM, but only from a specific IP
+  address (or a range, depending on your preference).  Here are the steps to run within
+  the VM:
   ```
-  $ curl -sLo - https://github.com/zendesk/maxwell/releases/download/v1.20.0/maxwell-1.20.0.tar.gz | tar zxvf -
+  $ sudo apt install python-pip
+  $ pip install webssh
+  $ ~/.local/bin/wssh --sslport=8443 --certfile='./your_ssl_cert.crt' --keyfile='./your_ssl_cert.key'
   ```
+* The WebSSH approach uses SSH to connect to `localhost` using a password, adding a couple of steps.
+  1. Enable SSH via password, for `localhost` only by editing `/etc/ssh/sshd_config`, adding this:
+     ```
+     # Settings that override the global settings for matching IP addresses only
+     Match address 127.0.0.1/32
+         PasswordAuthentication yes
+     ```
+  1. Restart the SSH daemon: `sudo service sshd restart`
+  1. Assign a password for user `ubuntu`: `sudo passwd ubuntu`.  We'll refer to this later as `NEW_PASSWORD`.
+* Install and initialize Greenplum Database: [OSS](https://greenplum.org/download/) or
+  [Pivotal supported](https://network.pivotal.io/products/pivotal-gpdb/)
+* Install RabbitMQ and start it up (varies by operating system).
+* Install MySQL server.
+* Follow the procedure in [Maxwell's Daemon quick start](http://maxwells-daemon.io/quickstart/)
 * Start Maxwell's Daemon (by default, it uses the "guest" account in RabbitMQ):
   ```
-  $ ./maxwell-1.20.0/bin/maxwell --output_ddl=true --user='maxwell' --password='maxwell' --producer=rabbitmq --rabbitmq_host='127.0.0.1' --rabbitmq_routing_key_template="mysql-cdc" --rabbitmq_exchange_durable=true
+  $ ./maxwell-1.*/bin/maxwell --output_ddl=true --user='maxwell' --password='maxwell' --producer=rabbitmq --rabbitmq_host='127.0.0.1' --rabbitmq_routing_key_template="mysql-cdc" --rabbitmq_exchange_durable=true
   ```
-* Build / Install the RabbitMQ client:
+* Install Go and create your gopath directory (here, we install onto Ubuntu):
+  ```
+  $ sudo apt-get install golang-go
+  $ mkdir ~/go
+  ```
+* Build and install the RabbitMQ client (it's in this GitHub repo):
   ```
   $ git clone https://github.com/mgoddard-pivotal/greenplum-cdc.git
   $ cd greenplum-cdc/
   $ git checkout rabbitmq
-  $ sudo yum -y install go # On CentOS.  Use whichever installation method applies to your OS.
   $ go get github.com/streadway/amqp
   $ go build rabbitmq.go
-  $ cp -f rabbitmq ~/
+  $ sudo cp -f rabbitmq ~gpadmin/
   ```
 * While logged in as `gpadmin`, run the following to set up the tables and functions to handle CDC:
   ```
@@ -111,7 +139,7 @@ this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operatio
   - `DROP TABLE`
   - `DROP DATABASE`
 
-## Deploying Maxwell's Daemon in Cloud Foundry
+## (Future) Deploying Maxwell's Daemon in Cloud Foundry
 1. Create an instance of the MySQL service (NOTE: this won't work yet since it requires the escalated privileges to perform the required `GRANT` operations).
 1. [Accessing service instance via SSH](https://docs.pivotal.io/pivotalcf/2-3/devguide/deploy-apps/ssh-services.html)
 1. Create an instance of a RabbitMQ service.
@@ -124,16 +152,10 @@ this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operatio
 1. Add some scripts to handle periodic Greenplum maintenance
    * [Vacuum tables and catalog](https://gpdb.docs.pivotal.io/43170/admin_guide/managing/maintain.html)
 2. Add another consumer group to "fan out" to Elastic Search
-   * Try just using a single index for all tables
-   * Form the `doc_id` using the primary key values from the table?
-   * Also index/store the DB name and the table name
 3. Consider how an "undo" would work, since we can reverse any action.
 4. Enhance demo to include data from a µ-services architecture, like [this one](https://spring.io/blog/2015/07/14/microservices-with-spring)
 
-## See also
-* [Canal](https://github.com/siddontang/go-mysql#canal), a Go lang binlog replicator
-
-## Known issues
+## Known issue
 
 ### After the VM running the whole demo crashed, I encountered this state upon restarting Maxwell's Daemon:
 ```
