@@ -1,8 +1,6 @@
 # CDC Demo Script
 
-## Open the following links, one per browser tab
-
-**NOTE:**
+## NOTE
 
 * So far, this has been tested using Chrome, on a Mac.
 * The hostname in these links, `cdc-demo.hooliroof.com`, varies per installation of the demo.
@@ -12,12 +10,15 @@
   $ echo -n "NEW_PASSWORD" | base64
   ```
 
-1. [Start Maxwell's Daemon](https://cdc-demo.hooliroof.com:8443/?title=Maxwell&command=./01_run_maxwell.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [RabbitMQ to Greenplum](https://cdc-demo.hooliroof.com:8443/?title=RMQ to GPDB&command=./02_rmq_to_gpdb.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [Run Spring Music](https://cdc-demo.hooliroof.com:8443/?title=Run Spring Music&command=./03_run_spring_music.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [Poll the MySQL DB](https://cdc-demo.hooliroof.com:8443/?title=MySQL Poll&command=./04_mysql_poll.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [Poll Greenplum DB](https://cdc-demo.hooliroof.com:8443/?title=GPDB Poll&command=./05_gpdb_poll.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [Run a MySQL client](https://cdc-demo.hooliroof.com:8443/?title=MySQL Client&command=./06_mysql_client.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color)
-1. [Spring Music Web UI](http://cdc-demo.hooliroof.com:8080/)
+## Open the following links, one per browser tab
 
+<ol>
+ <li><a href="https://cdc-demo.hooliroof.com:8443/?title=Maxwell&command=./01_run_maxwell.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">Start Maxwell's Daemon</a></li>
+<li><a href="https://cdc-demo.hooliroof.com:8443/?title=RMQ to GPDB&command=./02_rmq_to_gpdb.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">RabbitMQ to Greenplum</a></li>
+<li><a href="https://cdc-demo.hooliroof.com:8443/?title=Run Spring Music&command=./03_run_spring_music.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">Run Spring Music</a></li>
+<li><a href="https://cdc-demo.hooliroof.com:8443/?title=MySQL Poll&command=./04_mysql_poll.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">Poll the MySQL DB</a></li>
+<li><a href="https://cdc-demo.hooliroof.com:8443/?title=GPDB Poll&command=./05_gpdb_poll.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">Poll Greenplum DB</a></li>
+<li><a href="https://cdc-demo.hooliroof.com:8443/?title=MySQL Client&command=./06_mysql_client.sh;exit&hostname=localhost&username=ubuntu&password=WUdRTEZJREVSWFNSRFlESkVaTU8=&term=xterm-256color">Run a MySQL client</a></li>
+<li><a href="http://cdc-demo.hooliroof.com:8080/">Spring Music Web UI</a>
+</ol>
 
