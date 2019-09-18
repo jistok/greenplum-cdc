@@ -1,4 +1,4 @@
-# Change Data Capture (CDC) from MySQL to Greenplum Database
+# [Demo](./demo/cdc_demo_script.md) of Change Data Capture (CDC) from MySQL to Greenplum
 
 ![Components of the CDC demo](./images/cdc_demo_arch_diagram.png)
 
