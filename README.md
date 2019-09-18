@@ -2,7 +2,7 @@
 
 ![Components of the CDC demo](./images/cdc_demo_arch_diagram.png)
 
-[Video walk-through of demo, on YouTube](https://youtu.be/U6jmdhkPEO0)
+![YouTube logo](./images/youtube.png)[Video walk-through of this demo](https://youtu.be/U6jmdhkPEO0)
 
 ## Abstract
 When a Pivotal Cloud Foundry operator installs PCF, it’s likely they will
