@@ -152,11 +152,10 @@ this event in the "RabbitMQ => Greenplum" tab.  Here are some other DDL operatio
 1. Start Maxwell's Daemon: `cf start maxwell`
 
 ## TODO
-1. Add some scripts to handle periodic Greenplum maintenance
-   * [Vacuum tables and catalog](https://gpdb.docs.pivotal.io/43170/admin_guide/managing/maintain.html)
-2. Add another consumer group to "fan out" to Elastic Search
-3. Consider how an "undo" would work, since we can reverse any action.
-4. Enhance demo to include data from a µ-services architecture, like [this one](https://spring.io/blog/2015/07/14/microservices-with-spring)
+1. Duplicate this, but for Postgres.  [This](https://github.com/eulerto/wal2json) looks like a promising starting point.
+1. Add another consumer group to "fan out" to Elastic Search.
+1. Consider how an "undo" would work, since we can reverse any action.
+1. Enhance the demo to include data from a µ-services architecture, like [this one](https://spring.io/blog/2015/07/14/microservices-with-spring).
 
 ## Known issue
 
